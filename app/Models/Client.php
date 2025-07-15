@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Client extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'position',
+        'start_date',
+        'access_level',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'access_level' => 'string',
+    ];
+
+    public function machines(): HasMany
+    {
+        return $this->hasMany(Machine::class);
+    }
+    
+} 
