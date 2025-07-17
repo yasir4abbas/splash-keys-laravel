@@ -17,6 +17,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('clients', [ClientController::class, 'index'])->name('clients');
+    Route::get('clients/create', [ClientController::class, 'create'])->name('clients.create');
+    Route::get('clients/create/{id}', [ClientController::class, 'edit'])->name('clients.edit');
     Route::get('clients/list', [ClientController::class, 'list'])->name('clients.list');
     Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
     Route::patch('clients/{id}', [ClientController::class, 'update'])->name('clients.update');
@@ -29,6 +31,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('machines/{id}', [MachineController::class, 'destroy'])->name('machines.destroy');
 
     Route::get('licenses', [LicenseController::class, 'index'])->name('licenses');
+    Route::get('licenses/create', [LicenseController::class, 'create'])->name('licenses.create');
+    Route::get('licenses/create/{id}', [LicenseController::class, 'edit'])->name('licenses.edit');
+    
     Route::get('licenses/list', [LicenseController::class, 'list'])->name('licenses.list');
     Route::get('licenses/packages', [LicenseController::class, 'getPackages'])->name('licenses.packages');
     Route::post('licenses', [LicenseController::class, 'store'])->name('licenses.store');
@@ -36,6 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('licenses/{id}', [LicenseController::class, 'destroy'])->name('licenses.destroy');
 
     Route::get('packages', [PackageController::class, 'index'])->name('packages');
+    Route::get('packages/create', [PackageController::class, 'create'])->name('packages.create');
+    Route::get('packages/create/{id}', [PackageController::class, 'edit'])->name('packages.edit');
     Route::get('packages/list', [PackageController::class, 'list'])->name('packages.list');
     Route::post('packages', [PackageController::class, 'store'])->name('packages.store');
     Route::patch('packages/{id}', [PackageController::class, 'update'])->name('packages.update');

@@ -23,6 +23,24 @@ class LicenseController extends Controller
         return Inertia::render('licenses');
     }
 
+    public function edit($id)
+    {
+        $license = License::find($id);
+        $packages = Package::select('id', 'package_name', 'version')->get();
+        return Inertia::render('licenses/create', [
+            'license' => $license,
+            'packages' => $packages
+        ]);
+    }
+
+    public function create()
+    {
+        $packages = Package::select('id', 'package_name', 'version')->get();
+        return Inertia::render('licenses/create', [
+            'packages' => $packages
+        ]);
+    }
+
     public function list()
     {
         $licenses = License::all();

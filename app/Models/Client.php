@@ -27,5 +27,10 @@ class Client extends Model
     {
         return $this->hasMany(Machine::class);
     }
+
+    public function clientIPs(): HasMany
+    {
+        return $this->hasMany(ClientIP::class);
+    }
     
 } 

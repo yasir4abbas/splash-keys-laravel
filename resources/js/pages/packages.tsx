@@ -111,18 +111,22 @@ export default function Packages() {
   }, []);
 
   const onDelete = (packageItem: any) => {
-      if (window.confirm(`Are you sure you want to delete package "${packageItem.package_name}"?`)) {
-        router.delete(route('packages.destroy', {id: packageItem.id} ), {
-          onSuccess: () => {
-              dispatch({ type: 'DELETE_PACKAGE', payload: packageItem.id });
-          }
-      });
-      }
+    console.log('onDelete called with:', packageItem);
+    if (window.confirm(`Are you sure you want to delete package "${packageItem.package_name}"?`)) {
+      router.delete(route('packages.destroy', {id: packageItem.id} ), {
+        onSuccess: () => {
+            dispatch({ type: 'DELETE_PACKAGE', payload: packageItem.id });
+        }
+    });
+    }
   }
 
   const onEdit = (packageItem: any) => {
-      dispatch({ type: 'SET_SELECTED_PACKAGE', payload: packageItem });
-      dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: true });
+    console.log('onEdit called with:', packageItem);
+    console.log('Route:', route('packages.edit', {id: packageItem.id}));
+    dispatch({ type: 'SET_SELECTED_PACKAGE', payload: packageItem });
+    router.visit(route('packages.edit', {id: packageItem.id}));
+    // dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: true });
   }
 
   const handleAddSuccess = (newPackage: any) => {
@@ -143,7 +147,7 @@ export default function Packages() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between space-y-2">
                         <h1 className="text-2xl font-bold mb-4">Packages</h1>
-                        <PackageAddDialog 
+                        {/* <PackageAddDialog 
                             onSuccess={handleAddSuccess} 
                         />
                         <PackageEditDialog
@@ -151,7 +155,12 @@ export default function Packages() {
                             onOpenChange={handleEditDialogChange}
                             package={state.selectedPackage}
                             onSuccess={handleEditSuccess}
-                        />
+                        /> */}
+                         <Button>
+                            <Link href={route('packages.create')}>
+                                Add Package
+                            </Link>
+                        </Button>
                     </div>
                 <div>
                   {state.isLoading ? (

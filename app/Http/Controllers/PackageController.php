@@ -22,9 +22,22 @@ class PackageController extends Controller
         return Inertia::render('packages');
     }
 
+    public function edit($id)
+    {
+        $package = Package::with('meta')->find($id);
+        return Inertia::render('packages/create', [
+            'package' => $package
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('packages/create');
+    }
+
     public function list()
     {
-        $packages = Package::all();
+        $packages = Package::with('meta')->get();
         return response()->json($packages);
     }
 
@@ -35,8 +48,20 @@ class PackageController extends Controller
             'version' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'support_contact' => 'required|string|max:255',
+            'metadata' => 'array',
+            'metadata.*.key' => 'string|max:255',
+            'metadata.*.value' => 'string|max:255',
         ]);
-        $package = Package::create($request->all());
+        
+        $package = Package::create($request->except('metadata'));
+        if ($request->has('metadata')) {
+            foreach ($request->metadata as $meta) {
+                if (!empty($meta['key']) && !empty($meta['value'])) {
+                    $package->setMeta($meta['key'], $meta['value']);
+                }
+            }
+        }
+        
         return back()->withErrors(['data' => json_encode($package)]);
     }
 
@@ -47,9 +72,26 @@ class PackageController extends Controller
             'version' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'support_contact' => 'required|string|max:255',
+            'metadata' => 'array',
+            'metadata.*.key' => 'string|max:255',
+            'metadata.*.value' => 'string|max:255',
         ]);
+        
         $package = Package::find($id);
-        $package->update($request->all());
+        $package->update($request->except('metadata'));
+        
+        // Clear existing metadata and add new ones
+        $package->meta()->delete();
+        
+        // Handle metadata
+        if ($request->has('metadata')) {
+            foreach ($request->metadata as $meta) {
+                if (!empty($meta['key']) && !empty($meta['value'])) {
+                    $package->setMeta($meta['key'], $meta['value']);
+                }
+            }
+        }
+        
         return back()->withErrors(['data' => json_encode($package)]);
     }
 

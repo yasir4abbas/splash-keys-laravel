@@ -22,9 +22,26 @@ class ClientController extends Controller
         return Inertia::render('clients');
     }
 
+    public function edit($id)
+    {
+        $client = Client::with('clientIPs')->find($id);
+        $client->hostnames = $client->clientIPs->pluck('hostname')->toArray();
+        return Inertia::render('clients/create', [
+            'client' => $client
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('clients/create');
+    }
+
     public function list()
     {
-        $clients = Client::all();
+        $clients = Client::with('clientIPs')->get();
+        $clients->each(function ($client) {
+            $client->hostnames = $client->clientIPs->pluck('hostname')->toArray();
+        });
         return response()->json($clients);
     }
 
@@ -36,8 +53,23 @@ class ClientController extends Controller
             'position' => 'required|string|max:255',
             'start_date' => 'required|date',
             'access_level' => 'required|string|max:255',
+            'hostnames' => 'array',
+            'hostnames.*' => 'string|max:255',
         ]);
-        $client = Client::create($request->all());
+        
+        $client = Client::create($request->except('hostnames'));
+        
+        // Handle hostnames
+        if ($request->has('hostnames')) {
+            foreach ($request->hostnames as $hostname) {
+                if (!empty($hostname)) {
+                    $client->clientIPs()->create([
+                        'hostname' => $hostname,
+                    ]);
+                }
+            }
+        }
+        
         return back()->withErrors(['data' => json_encode($client)]);
     }
 
@@ -45,13 +77,28 @@ class ClientController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:clients,email',
+            'email' => 'required|email|max:255|unique:clients,email,' . $id,
             'position' => 'required|string|max:255',
             'start_date' => 'required|date',
             'access_level' => 'required|string|max:255',
+            'hostnames' => 'array',
+            'hostnames.*' => 'string|max:255',
         ]);
+        
         $client = Client::find($id);
-        $client->update($request->all());
+        $client->update($request->except('hostnames'));
+        
+        $client->clientIPs()->delete();
+        if ($request->has('hostnames')) {
+            foreach ($request->hostnames as $hostname) {
+                if (!empty($hostname)) {
+                    $client->clientIPs()->create([
+                        'hostname' => $hostname,
+                    ]);
+                }
+            }
+        }
+        
         return back()->withErrors(['data' => json_encode($client)]);
     }
 

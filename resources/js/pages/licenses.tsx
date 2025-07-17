@@ -143,7 +143,8 @@ export default function Licenses() {
 
   const onEdit = (license: any) => {
       dispatch({ type: 'SET_SELECTED_LICENSE', payload: license });
-      dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: true });
+      router.visit(route('licenses.edit', {id: license.id}));
+    //   dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: true });
   }
 
   const handleAddSuccess = (newLicense: any) => {
@@ -164,7 +165,7 @@ export default function Licenses() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between space-y-2">
                         <h1 className="text-2xl font-bold mb-4">Licenses</h1>
-                        <LicenseAddDialog 
+                        {/* <LicenseAddDialog 
                             onSuccess={handleAddSuccess}
                             packages={state.Packages}
                         />
@@ -174,7 +175,12 @@ export default function Licenses() {
                             license={state.selectedLicense}
                             onSuccess={handleEditSuccess}
                             packages={state.Packages}
-                        />
+                        /> */}
+                        <Button>
+                            <Link href={route('licenses.create')}>
+                                Add License
+                            </Link>
+                        </Button>
                     </div>
                 <div>
                   {state.isLoading ? (
@@ -199,392 +205,392 @@ export default function Licenses() {
     );
 }
 
-export function LicenseAddDialog({ onSuccess, packages }: { onSuccess?: (newLicense: any) => void, packages: any[] }) {
-    const [ isCollapsed, setIsCollapsed] = useState(false);
-    const { data, setData, post, processing, errors, reset } = useForm({
-        license_key: '',
-        license_type: 'per-user',
-        max_count: 1,
-        expiration_date: '',
-        cost: '',
-        renewal_terms: '',
-        status: 'active',
-        package_id: '',
-    });
+// export function LicenseAddDialog({ onSuccess, packages }: { onSuccess?: (newLicense: any) => void, packages: any[] }) {
+//     const [ isCollapsed, setIsCollapsed] = useState(false);
+//     const { data, setData, post, processing, errors, reset } = useForm({
+//         license_key: '',
+//         license_type: 'per-user',
+//         max_count: 1,
+//         expiration_date: '',
+//         cost: '',
+//         renewal_terms: '',
+//         status: 'active',
+//         package_id: '',
+//     });
 
-    function generateKey() {
-        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let key = '';
-        for (let i = 0; i < 20; i++) {
-            key += charset.charAt(Math.floor(Math.random() * charset.length));
-        }
-        setData('license_key', key);
-    }
+//     function generateKey() {
+//         const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//         let key = '';
+//         for (let i = 0; i < 20; i++) {
+//             key += charset.charAt(Math.floor(Math.random() * charset.length));
+//         }
+//         setData('license_key', key);
+//     }
 
-    const handleOpenChange = (newOpen: boolean) => {
-        if (!newOpen) {
-            reset();
-        }
-        setIsCollapsed(newOpen);
-    };
+//     const handleOpenChange = (newOpen: boolean) => {
+//         if (!newOpen) {
+//             reset();
+//         }
+//         setIsCollapsed(newOpen);
+//     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('licenses.store'), {
-            preserveScroll: true,
-            onError: (errors: any) => {
-              if (errors.data) {
-                try {
-                  const licenseData = JSON.parse(errors.data);
-                  onSuccess?.(licenseData);
-                  handleOpenChange(false);
-                } catch (e) {
-                  console.error('Error parsing response:', e);
-                }
-              }
-            },
-        });
-    };
+//     const handleSubmit = (e: React.FormEvent) => {
+//         e.preventDefault();
+//         post(route('licenses.store'), {
+//             preserveScroll: true,
+//             onError: (errors: any) => {
+//               if (errors.data) {
+//                 try {
+//                   const licenseData = JSON.parse(errors.data);
+//                   onSuccess?.(licenseData);
+//                   handleOpenChange(false);
+//                 } catch (e) {
+//                   console.error('Error parsing response:', e);
+//                 }
+//               }
+//             },
+//         });
+//     };
 
-    return (
-        <Dialog open={isCollapsed} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                <Button>
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    Add License
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Add New License</DialogTitle>
-                    <DialogDescription>
-                        Create a new license for your software package.
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="license_key">
-                                License Key
-                            </Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="license_key"
-                                    value={data.license_key}
-                                    onChange={(e) => setData('license_key', e.target.value)}
-                                    placeholder="Enter license key"
-                                />
-                                <Button type="button" variant="outline" onClick={generateKey} title="Generate Key">
-                                    <RefreshCw className="w-4 h-4" />
-                                </Button>
-                            </div>
-                            {errors.license_key && <InputError message={errors.license_key} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="license_type">
-                                Type
-                            </Label>
-                            <Select value={data.license_type} onValueChange={(value) => setData('license_type', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select license type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="per-user">Per User</SelectItem>
-                                    <SelectItem value="per-machine">Per Machine</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {errors.license_type && <InputError message={errors.license_type} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="max_count">
-                                Max Count
-                            </Label>
-                            <Input
-                                id="max_count"
-                                type="number"
-                                value={data.max_count}
-                                onChange={(e) => setData('max_count', parseInt(e.target.value))}
-                                placeholder="Enter max count"
-                            />
-                            {errors.max_count && <InputError message={errors.max_count} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="expiration_date">
-                                Expiration Date
-                            </Label>
-                            <Input
-                                id="expiration_date"
-                                type="date"
-                                value={data.expiration_date}
-                                onChange={(e) => setData('expiration_date', e.target.value)}
-                            />
-                            {errors.expiration_date && <InputError message={errors.expiration_date} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="cost">
-                                Cost
-                            </Label>
-                            <Input
-                                id="cost"
-                                value={data.cost}
-                                onChange={(e) => setData('cost', e.target.value)}
-                                placeholder="Enter cost"
-                            />
-                            {errors.cost && <InputError message={errors.cost} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="renewal_terms">
-                                Renewal Terms
-                            </Label>
-                            <Textarea
-                                id="renewal_terms"
-                                value={data.renewal_terms}
-                                onChange={(e) => setData('renewal_terms', e.target.value)}
-                                placeholder="Enter renewal terms"
-                            />
-                            {errors.renewal_terms && <InputError message={errors.renewal_terms} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="status">
-                                Status
-                            </Label>
-                            <Select value={data.status} onValueChange={(value) => setData('status', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="inactive">Inactive</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {errors.status && <InputError message={errors.status} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="package_id">
-                                Package
-                            </Label>
-                            <Select value={data.package_id} onValueChange={(value) => setData('package_id', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select package" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {packages.map((pkg) => (
-                                        <SelectItem key={pkg.id} value={pkg.id.toString()}>
-                                            {pkg.package_name} v{pkg.version}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.package_id && <InputError message={errors.package_id} />}
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" disabled={processing}>
-                            {processing ? 'Creating...' : 'Create License'}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
-}
+//     return (
+//         <Dialog open={isCollapsed} onOpenChange={handleOpenChange}>
+//             <DialogTrigger asChild>
+//                 <Button>
+//                     <PlusIcon className="mr-2 h-4 w-4" />
+//                     Add License
+//                 </Button>
+//             </DialogTrigger>
+//             <DialogContent className="sm:max-w-[425px]">
+//                 <DialogHeader>
+//                     <DialogTitle>Add New License</DialogTitle>
+//                     <DialogDescription>
+//                         Create a new license for your software package.
+//                     </DialogDescription>
+//                 </DialogHeader>
+//                 <form onSubmit={handleSubmit}>
+//                     <div className="space-y-4 py-4">
+//                         <div className="space-y-2">
+//                             <Label htmlFor="license_key">
+//                                 License Key
+//                             </Label>
+//                             <div className="flex gap-2">
+//                                 <Input
+//                                     id="license_key"
+//                                     value={data.license_key}
+//                                     onChange={(e) => setData('license_key', e.target.value)}
+//                                     placeholder="Enter license key"
+//                                 />
+//                                 <Button type="button" variant="outline" onClick={generateKey} title="Generate Key">
+//                                     <RefreshCw className="w-4 h-4" />
+//                                 </Button>
+//                             </div>
+//                             {errors.license_key && <InputError message={errors.license_key} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="license_type">
+//                                 Type
+//                             </Label>
+//                             <Select value={data.license_type} onValueChange={(value) => setData('license_type', value)}>
+//                                 <SelectTrigger>
+//                                     <SelectValue placeholder="Select license type" />
+//                                 </SelectTrigger>
+//                                 <SelectContent>
+//                                     <SelectItem value="per-user">Per User</SelectItem>
+//                                     <SelectItem value="per-machine">Per Machine</SelectItem>
+//                                 </SelectContent>
+//                             </Select>
+//                             {errors.license_type && <InputError message={errors.license_type} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="max_count">
+//                                 Max Count
+//                             </Label>
+//                             <Input
+//                                 id="max_count"
+//                                 type="number"
+//                                 value={data.max_count}
+//                                 onChange={(e) => setData('max_count', parseInt(e.target.value))}
+//                                 placeholder="Enter max count"
+//                             />
+//                             {errors.max_count && <InputError message={errors.max_count} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="expiration_date">
+//                                 Expiration Date
+//                             </Label>
+//                             <Input
+//                                 id="expiration_date"
+//                                 type="date"
+//                                 value={data.expiration_date}
+//                                 onChange={(e) => setData('expiration_date', e.target.value)}
+//                             />
+//                             {errors.expiration_date && <InputError message={errors.expiration_date} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="cost">
+//                                 Cost
+//                             </Label>
+//                             <Input
+//                                 id="cost"
+//                                 value={data.cost}
+//                                 onChange={(e) => setData('cost', e.target.value)}
+//                                 placeholder="Enter cost"
+//                             />
+//                             {errors.cost && <InputError message={errors.cost} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="renewal_terms">
+//                                 Renewal Terms
+//                             </Label>
+//                             <Textarea
+//                                 id="renewal_terms"
+//                                 value={data.renewal_terms}
+//                                 onChange={(e) => setData('renewal_terms', e.target.value)}
+//                                 placeholder="Enter renewal terms"
+//                             />
+//                             {errors.renewal_terms && <InputError message={errors.renewal_terms} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="status">
+//                                 Status
+//                             </Label>
+//                             <Select value={data.status} onValueChange={(value) => setData('status', value)}>
+//                                 <SelectTrigger>
+//                                     <SelectValue placeholder="Select status" />
+//                                 </SelectTrigger>
+//                                 <SelectContent>
+//                                     <SelectItem value="active">Active</SelectItem>
+//                                     <SelectItem value="inactive">Inactive</SelectItem>
+//                                 </SelectContent>
+//                             </Select>
+//                             {errors.status && <InputError message={errors.status} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="package_id">
+//                                 Package
+//                             </Label>
+//                             <Select value={data.package_id} onValueChange={(value) => setData('package_id', value)}>
+//                                 <SelectTrigger>
+//                                     <SelectValue placeholder="Select package" />
+//                                 </SelectTrigger>
+//                                 <SelectContent>
+//                                     {packages.map((pkg) => (
+//                                         <SelectItem key={pkg.id} value={pkg.id.toString()}>
+//                                             {pkg.package_name} v{pkg.version}
+//                                         </SelectItem>
+//                                     ))}
+//                                 </SelectContent>
+//                             </Select>
+//                             {errors.package_id && <InputError message={errors.package_id} />}
+//                         </div>
+//                     </div>
+//                     <DialogFooter>
+//                         <Button type="submit" disabled={processing}>
+//                             {processing ? 'Creating...' : 'Create License'}
+//                         </Button>
+//                     </DialogFooter>
+//                 </form>
+//             </DialogContent>
+//         </Dialog>
+//     );
+// }
 
-export function LicenseEditDialog({ open, onOpenChange, license, onSuccess, packages }: { open: boolean, onOpenChange: (open: boolean) => void, license: any, onSuccess?: (updatedLicense: any) => void, packages: any[] }) {
-    const { data, setData, patch, processing, errors, reset } = useForm({
-        license_key: '',
-        license_type: 'per-user',
-        max_count: 1,
-        expiration_date: '',
-        cost: '',
-        renewal_terms: '',
-        status: 'active',
-        package_id: '',
-    });
+// export function LicenseEditDialog({ open, onOpenChange, license, onSuccess, packages }: { open: boolean, onOpenChange: (open: boolean) => void, license: any, onSuccess?: (updatedLicense: any) => void, packages: any[] }) {
+//     const { data, setData, patch, processing, errors, reset } = useForm({
+//         license_key: '',
+//         license_type: 'per-user',
+//         max_count: 1,
+//         expiration_date: '',
+//         cost: '',
+//         renewal_terms: '',
+//         status: 'active',
+//         package_id: '',
+//     });
 
-    function generateKey() {
-        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let key = '';
-        for (let i = 0; i < 20; i++) {
-            key += charset.charAt(Math.floor(Math.random() * charset.length));
-        }
-        setData('license_key', key);
-    }
+//     function generateKey() {
+//         const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//         let key = '';
+//         for (let i = 0; i < 20; i++) {
+//             key += charset.charAt(Math.floor(Math.random() * charset.length));
+//         }
+//         setData('license_key', key);
+//     }
 
-    useEffect(() => {
-        if (license) {
-            setData({
-                license_key: license.license_key || '',
-                license_type: license.license_type || 'per-user',
-                max_count: license.max_count || 1,
-                expiration_date: license.expiration_date || '',
-                cost: license.cost || '',
-                renewal_terms: license.renewal_terms || '',
-                status: license.status || 'active',
-                package_id: license.package_id?.toString() || '',
-            });
-        }
-    }, [license]);
+//     useEffect(() => {
+//         if (license) {
+//             setData({
+//                 license_key: license.license_key || '',
+//                 license_type: license.license_type || 'per-user',
+//                 max_count: license.max_count || 1,
+//                 expiration_date: license.expiration_date || '',
+//                 cost: license.cost || '',
+//                 renewal_terms: license.renewal_terms || '',
+//                 status: license.status || 'active',
+//                 package_id: license.package_id?.toString() || '',
+//             });
+//         }
+//     }, [license]);
 
-    const handleOpenChange = (newOpen: boolean) => {
-        if (!newOpen) {
-            reset();
-        }
-        onOpenChange(newOpen);
-    };
+//     const handleOpenChange = (newOpen: boolean) => {
+//         if (!newOpen) {
+//             reset();
+//         }
+//         onOpenChange(newOpen);
+//     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        patch(route('licenses.update', { id: license?.id }), {
-            preserveScroll: true,
-            onError: (errors: any) => {
-              if (errors.data) {
-                try {
-                  const licenseData = JSON.parse(errors.data);
-                  onSuccess?.(licenseData);
-                  handleOpenChange(false);
-                } catch (e) {
-                  console.error('Error parsing response:', e);
-                }
-              }
-            },
-        });
-    };
+//     const handleSubmit = (e: React.FormEvent) => {
+//         e.preventDefault();
+//         patch(route('licenses.update', { id: license?.id }), {
+//             preserveScroll: true,
+//             onError: (errors: any) => {
+//               if (errors.data) {
+//                 try {
+//                   const licenseData = JSON.parse(errors.data);
+//                   onSuccess?.(licenseData);
+//                   handleOpenChange(false);
+//                 } catch (e) {
+//                   console.error('Error parsing response:', e);
+//                 }
+//               }
+//             },
+//         });
+//     };
 
-    if (!license) return null;
+//     if (!license) return null;
 
-    return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Edit License</DialogTitle>
-                    <DialogDescription>
-                        Update the license information.
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="license_key">
-                                License Key
-                            </Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="license_key"
-                                    value={data.license_key}
-                                    onChange={(e) => setData('license_key', e.target.value)}
-                                    placeholder="Enter license key"
-                                />
-                                <Button type="button" variant="outline" onClick={generateKey} title="Generate Key">
-                                    <RefreshCw className="w-4 h-4" />
-                                </Button>
-                            </div>
-                            {errors.license_key && <InputError message={errors.license_key} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="license_type">
-                                Type
-                            </Label>
-                            <Select value={data.license_type} onValueChange={(value) => setData('license_type', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select license type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="per-user">Per User</SelectItem>
-                                    <SelectItem value="per-machine">Per Machine</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {errors.license_type && <InputError message={errors.license_type} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="max_count">
-                                Max Count
-                            </Label>
-                            <Input
-                                id="max_count"
-                                type="number"
-                                value={data.max_count}
-                                onChange={(e) => setData('max_count', parseInt(e.target.value))}
-                                placeholder="Enter max count"
-                            />
-                            {errors.max_count && <InputError message={errors.max_count} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="expiration_date">
-                                Expiration Date
-                            </Label>
-                            <Input
-                                id="expiration_date"
-                                type="date"
-                                value={data.expiration_date}
-                                onChange={(e) => setData('expiration_date', e.target.value)}
-                            />
-                            {errors.expiration_date && <InputError message={errors.expiration_date} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="cost">
-                                Cost
-                            </Label>
-                            <Input
-                                id="cost"
-                                value={data.cost}
-                                onChange={(e) => setData('cost', e.target.value)}
-                                placeholder="Enter cost"
-                            />
-                            {errors.cost && <InputError message={errors.cost} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="renewal_terms">
-                                Renewal Terms
-                            </Label>
-                            <Textarea
-                                id="renewal_terms"
-                                value={data.renewal_terms}
-                                onChange={(e) => setData('renewal_terms', e.target.value)}
-                                placeholder="Enter renewal terms"
-                            />
-                            {errors.renewal_terms && <InputError message={errors.renewal_terms} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="status">
-                                Status
-                            </Label>
-                            <Select value={data.status} onValueChange={(value) => setData('status', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="inactive">Inactive</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {errors.status && <InputError message={errors.status} />}
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="package_id">
-                                Package
-                            </Label>
-                            <Select value={data.package_id} onValueChange={(value) => setData('package_id', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select package" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {packages.map((pkg) => (
-                                        <SelectItem key={pkg.id} value={pkg.id.toString()}>
-                                            {pkg.package_name} v{pkg.version}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.package_id && <InputError message={errors.package_id} />}
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" disabled={processing}>
-                            {processing ? 'Updating...' : 'Update License'}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
-}
+//     return (
+//         <Dialog open={open} onOpenChange={handleOpenChange}>
+//             <DialogContent className="sm:max-w-[425px]">
+//                 <DialogHeader>
+//                     <DialogTitle>Edit License</DialogTitle>
+//                     <DialogDescription>
+//                         Update the license information.
+//                     </DialogDescription>
+//                 </DialogHeader>
+//                 <form onSubmit={handleSubmit}>
+//                     <div className="space-y-4 py-4">
+//                         <div className="space-y-2">
+//                             <Label htmlFor="license_key">
+//                                 License Key
+//                             </Label>
+//                             <div className="flex gap-2">
+//                                 <Input
+//                                     id="license_key"
+//                                     value={data.license_key}
+//                                     onChange={(e) => setData('license_key', e.target.value)}
+//                                     placeholder="Enter license key"
+//                                 />
+//                                 <Button type="button" variant="outline" onClick={generateKey} title="Generate Key">
+//                                     <RefreshCw className="w-4 h-4" />
+//                                 </Button>
+//                             </div>
+//                             {errors.license_key && <InputError message={errors.license_key} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="license_type">
+//                                 Type
+//                             </Label>
+//                             <Select value={data.license_type} onValueChange={(value) => setData('license_type', value)}>
+//                                 <SelectTrigger>
+//                                     <SelectValue placeholder="Select license type" />
+//                                 </SelectTrigger>
+//                                 <SelectContent>
+//                                     <SelectItem value="per-user">Per User</SelectItem>
+//                                     <SelectItem value="per-machine">Per Machine</SelectItem>
+//                                 </SelectContent>
+//                             </Select>
+//                             {errors.license_type && <InputError message={errors.license_type} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="max_count">
+//                                 Max Count
+//                             </Label>
+//                             <Input
+//                                 id="max_count"
+//                                 type="number"
+//                                 value={data.max_count}
+//                                 onChange={(e) => setData('max_count', parseInt(e.target.value))}
+//                                 placeholder="Enter max count"
+//                             />
+//                             {errors.max_count && <InputError message={errors.max_count} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="expiration_date">
+//                                 Expiration Date
+//                             </Label>
+//                             <Input
+//                                 id="expiration_date"
+//                                 type="date"
+//                                 value={data.expiration_date}
+//                                 onChange={(e) => setData('expiration_date', e.target.value)}
+//                             />
+//                             {errors.expiration_date && <InputError message={errors.expiration_date} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="cost">
+//                                 Cost
+//                             </Label>
+//                             <Input
+//                                 id="cost"
+//                                 value={data.cost}
+//                                 onChange={(e) => setData('cost', e.target.value)}
+//                                 placeholder="Enter cost"
+//                             />
+//                             {errors.cost && <InputError message={errors.cost} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="renewal_terms">
+//                                 Renewal Terms
+//                             </Label>
+//                             <Textarea
+//                                 id="renewal_terms"
+//                                 value={data.renewal_terms}
+//                                 onChange={(e) => setData('renewal_terms', e.target.value)}
+//                                 placeholder="Enter renewal terms"
+//                             />
+//                             {errors.renewal_terms && <InputError message={errors.renewal_terms} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="status">
+//                                 Status
+//                             </Label>
+//                             <Select value={data.status} onValueChange={(value) => setData('status', value)}>
+//                                 <SelectTrigger>
+//                                     <SelectValue placeholder="Select status" />
+//                                 </SelectTrigger>
+//                                 <SelectContent>
+//                                     <SelectItem value="active">Active</SelectItem>
+//                                     <SelectItem value="inactive">Inactive</SelectItem>
+//                                 </SelectContent>
+//                             </Select>
+//                             {errors.status && <InputError message={errors.status} />}
+//                         </div>
+//                         <div className="space-y-2">
+//                             <Label htmlFor="package_id">
+//                                 Package
+//                             </Label>
+//                             <Select value={data.package_id} onValueChange={(value) => setData('package_id', value)}>
+//                                 <SelectTrigger>
+//                                     <SelectValue placeholder="Select package" />
+//                                 </SelectTrigger>
+//                                 <SelectContent>
+//                                     {packages.map((pkg) => (
+//                                         <SelectItem key={pkg.id} value={pkg.id.toString()}>
+//                                             {pkg.package_name} v{pkg.version}
+//                                         </SelectItem>
+//                                     ))}
+//                                 </SelectContent>
+//                             </Select>
+//                             {errors.package_id && <InputError message={errors.package_id} />}
+//                         </div>
+//                     </div>
+//                     <DialogFooter>
+//                         <Button type="submit" disabled={processing}>
+//                             {processing ? 'Updating...' : 'Update License'}
+//                         </Button>
+//                     </DialogFooter>
+//                 </form>
+//             </DialogContent>
+//         </Dialog>
+//     );
+// }

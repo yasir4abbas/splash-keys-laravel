@@ -1,15 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { DataTableRowActions } from "@/components/table/data-table-row-actions"
 
 export const packageColumns: ColumnDef<any>[] = [
   {
@@ -79,39 +72,43 @@ export const packageColumns: ColumnDef<any>[] = [
     },
   },
   {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row, table }) => {
+    accessorKey: "meta",
+    header: "Metadata",
+    cell: ({ row }) => {
       const packageItem = row.original
-
+      const metadata = packageItem.meta || []
+      
+      if (metadata.length === 0) {
+        return (
+          <div className="text-gray-400 text-sm">
+            No metadata
+          </div>
+        )
+      }
+      
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(packageItem.package_id)}
-            >
-              Copy Package ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => (table as any).meta?.onEdit?.(packageItem)}>
-              Edit Package
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => (table as any).meta?.onDelete?.(packageItem)}
-              className="text-red-600"
-            >
-              Delete Package
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="space-y-1">
+          {metadata.slice(0, 3).map((meta: any, index: number) => (
+            <div key={index} className="flex items-center gap-2 text-xs">
+              <span className="font-medium text-gray-600 min-w-0 truncate">
+                {meta.key}:
+              </span>
+              <span className="text-gray-800 truncate" title={meta.value}>
+                {meta.value}
+              </span>
+            </div>
+          ))}
+          {metadata.length > 3 && (
+            <div className="text-xs text-gray-500">
+              +{metadata.length - 3} more
+            </div>
+          )}
+        </div>
       )
     },
+  },
+  {
+    id: "actions",
+    cell: ({ row, table }) => <DataTableRowActions row={row} onDelete={() => (table.options.meta as any)?.onDelete?.(row.original)} onEdit={() => (table.options.meta as any)?.onEdit?.(row.original)} />,
   },
 ] 

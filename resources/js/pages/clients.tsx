@@ -121,8 +121,10 @@ export default function Clients() {
   }
 
   const onEdit = (client: any) => {
+      console.log('onEdit called with:', client);
+      console.log('Route:', route('clients.edit', {id: client.id}));
       dispatch({ type: 'SET_SELECTED_CLIENT', payload: client });
-      dispatch({ type: 'SET_EDIT_DIALOG_OPEN', payload: true });
+      router.visit(route('clients.edit', {id: client.id}));
   }
 
   const handleAddSuccess = (newClient: any) => {
@@ -143,15 +145,11 @@ export default function Clients() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between space-y-2">
                         <h1 className="text-2xl font-bold mb-4">Clients</h1>
-                        <ClientAddDialog 
-                            onSuccess={handleAddSuccess} 
-                        />
-                        <ClientEditDialog
-                            open={state.isEditDialogOpen} 
-                            onOpenChange={handleEditDialogChange}
-                            client={state.selectedClient}
-                            onSuccess={handleEditSuccess}
-                        />
+                        <Button>
+                            <Link href={route('clients.create')}>
+                                Add Client
+                            </Link>
+                        </Button>
                     </div>
                 <div>
                   {state.isLoading ? (
