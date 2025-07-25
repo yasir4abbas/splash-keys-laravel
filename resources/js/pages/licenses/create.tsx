@@ -1,6 +1,6 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
 
 import InputError from '@/components/input-error';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { RefreshCw, ArrowLeft } from 'lucide-react';
 
 interface LicenseFormData {
@@ -31,13 +32,14 @@ interface CreateLicensePageProps {
 export default function CreateLicense({ license, packages }: CreateLicensePageProps) {
     const { auth } = usePage<SharedData>().props;
     const isEditing = !!license;
+    const [hasExpiration, setHasExpiration] = useState(true);
     
     const { data, setData, post, patch, processing, errors, reset } = useForm({
         license_key: '',
-        license_type: 'per-user',
+        license_type: 'per-machine',
         max_count: 1,
         expiration_date: '',
-        cost: '',
+        cost: '0',
         renewal_terms: '',
         status: 'active',
         package_id: '',
@@ -75,11 +77,18 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
                 status: license.status || 'active',
                 package_id: license.package_id?.toString() || '',
             });
+            // Set expiration checkbox based on whether license has expiration date
+            setHasExpiration(!!license.expiration_date);
         }
     }, [license]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Handle expiration date based on checkbox
+        if (!hasExpiration) {
+            setData('expiration_date', '');
+        }
         
         if (isEditing) {
             patch(route('licenses.update', { id: license.id }), {
@@ -148,7 +157,7 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
 
                     <div className="max-w-2xl mx-auto">
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="border rounded-lg p-4">
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="license_key">
@@ -177,8 +186,8 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
                                                 <SelectValue placeholder="Select license type" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="per-user">Per User</SelectItem>
                                                 <SelectItem value="per-machine">Per Machine</SelectItem>
+                                                {/* <SelectItem value="per-user">Per User</SelectItem> */}
                                             </SelectContent>
                                         </Select>
                                         {errors.license_type && <InputError message={errors.license_type} />}
@@ -199,16 +208,36 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="expiration_date">
-                                            Expiration Date
-                                        </Label>
-                                        <Input
-                                            id="expiration_date"
-                                            type="date"
-                                            value={data.expiration_date}
-                                            onChange={(e) => setData('expiration_date', e.target.value)}
-                                        />
-                                        {errors.expiration_date && <InputError message={errors.expiration_date} />}
+                                        <div className="flex items-center space-x-2 mb-2">
+                                            <Checkbox
+                                                id="has_expiration"
+                                                checked={hasExpiration}
+                                                onCheckedChange={(checked) => {
+                                                    setHasExpiration(checked as boolean);
+                                                    if (!checked) {
+                                                        setData('expiration_date', '');
+                                                    }
+                                                }}
+                                            />
+                                            <Label htmlFor="has_expiration" className="text-sm font-medium">
+                                                Set expiration date
+                                            </Label>
+                                        </div>
+                                        {hasExpiration && (
+                                            <>
+                                                <Label htmlFor="expiration_date">
+                                                    Expiration Date
+                                                </Label>
+                                                <Input
+                                                    id="expiration_date"
+                                                    type="date"
+                                                    value={data.expiration_date}
+                                                    onChange={(e) => setData('expiration_date', e.target.value)}
+                                                    placeholder="Select expiration date"
+                                                />
+                                                {errors.expiration_date && <InputError message={errors.expiration_date} />}
+                                            </>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2">

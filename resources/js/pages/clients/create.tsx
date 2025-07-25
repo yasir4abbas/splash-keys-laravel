@@ -8,16 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DatePicker } from '@/components/date-picker';
 import { ArrowLeft, X } from 'lucide-react';
 
 interface ClientFormData {
     name: string;
     email: string;
-    position: string;
     start_date: string;
-    access_level: string;
     hostnames: string[];
 }
 
@@ -32,10 +29,8 @@ export default function CreateClient({ client }: CreateClientPageProps) {
     const { data, setData, post, patch, processing, errors, reset } = useForm({
         name: '',
         email: '',
-        position: '',
         start_date: '',
-        access_level: 'basic',
-        hostnames: [],
+        hostnames: [] as string[],
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -55,9 +50,7 @@ export default function CreateClient({ client }: CreateClientPageProps) {
             setData({
                 name: client.name || '',
                 email: client.email || '',
-                position: client.position || '',
                 start_date: client.start_date || '',
-                access_level: client.access_level || 'basic',
                 hostnames: client.hostnames || [],
             });
         }
@@ -133,7 +126,7 @@ export default function CreateClient({ client }: CreateClientPageProps) {
 
                     <div className="max-w-2xl mx-auto">
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="border rounded-lg p-4">
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="name">
@@ -165,20 +158,6 @@ export default function CreateClient({ client }: CreateClientPageProps) {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="position">
-                                            Position
-                                        </Label>
-                                        <Input
-                                            id="position"
-                                            value={data.position}
-                                            onChange={(e) => setData('position', e.target.value)}
-                                            placeholder="Enter position"
-                                            required
-                                        />
-                                        {errors.position && <InputError message={errors.position} />}
-                                    </div>
-
-                                    <div className="space-y-2">
                                         <Label htmlFor="start_date">
                                             Start Date
                                         </Label>
@@ -191,28 +170,10 @@ export default function CreateClient({ client }: CreateClientPageProps) {
                                         />
                                         {errors.start_date && <InputError message={errors.start_date} />}
                                     </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="access_level">
-                                            Access Level
-                                        </Label>
-                                        <Select value={data.access_level} onValueChange={(value) => setData('access_level', value)}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select access level" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="basic">Basic</SelectItem>
-                                                <SelectItem value="standard">Standard</SelectItem>
-                                                <SelectItem value="premium">Premium</SelectItem>
-                                                <SelectItem value="admin">Admin</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.access_level && <InputError message={errors.access_level} />}
-                                    </div>
                                 </div>
                             </div>
 
-                            <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="border rounded-lg p-4">
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="hostnames">
@@ -228,10 +189,10 @@ export default function CreateClient({ client }: CreateClientPageProps) {
                                                         <span>{hostname}</span>
                                                         <button
                                                             type="button"
-                                                                                                                    onClick={() => {
-                                                            const newHostnames = (data.hostnames as string[]).filter((_, i) => i !== index);
-                                                            setData('hostnames', newHostnames);
-                                                        }}
+                                                            onClick={() => {
+                                                                const newHostnames = data.hostnames.filter((_, i) => i !== index);
+                                                                setData('hostnames', newHostnames);
+                                                            }}
                                                             className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
                                                         >
                                                             <X className="h-3 w-3" />
@@ -243,24 +204,24 @@ export default function CreateClient({ client }: CreateClientPageProps) {
                                                 <Input
                                                     id="hostname-input"
                                                     placeholder="Enter hostname and press Enter"
-                                                                                                onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const input = e.target as HTMLInputElement;
-                                                    const hostname = input.value.trim();
-                                                    if (hostname && !(data.hostnames as string[]).includes(hostname)) {
-                                                        setData('hostnames', [...(data.hostnames as string[]), hostname]);
-                                                        input.value = '';
-                                                    }
-                                                }
-                                            }}
-                                                                                                onBlur={(e) => {
-                                                const hostname = e.target.value.trim();
-                                                if (hostname && !(data.hostnames as string[]).includes(hostname)) {
-                                                    setData('hostnames', [...(data.hostnames as string[]), hostname]);
-                                                    e.target.value = '';
-                                                }
-                                            }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            const input = e.target as HTMLInputElement;
+                                                            const hostname = input.value.trim();
+                                                            if (hostname && !data.hostnames.includes(hostname)) {
+                                                                setData('hostnames', [...data.hostnames, hostname]);
+                                                                input.value = '';
+                                                            }
+                                                        }
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        const hostname = e.target.value.trim();
+                                                        if (hostname && !data.hostnames.includes(hostname)) {
+                                                            setData('hostnames', [...data.hostnames, hostname]);
+                                                            e.target.value = '';
+                                                        }
+                                                    }}
                                                 />
                                                 <Button
                                                     type="button"

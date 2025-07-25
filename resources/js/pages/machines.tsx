@@ -130,10 +130,14 @@ export default function Machines() {
   }, []);
 
   const onDelete = (machine: any) => {
-      if (window.confirm(`Are you sure you want to delete machine "${machine.machine_id}"?`)) {
+      const displayName = machine.hostname || machine.machine_id;
+      if (window.confirm(`Are you sure you want to delete machine "${displayName}"?`)) {
         router.delete(route('machines.destroy', {id: machine.id} ), {
           onSuccess: () => {
               dispatch({ type: 'DELETE_MACHINE', payload: machine.id });
+          },
+          onError: (errors) => {
+              console.error('Delete failed:', errors);
           }
       });
       }
@@ -232,10 +236,8 @@ export function MachineAddDialog({ onSuccess, clients, licenses }: {
                 handleOpenChange(false);
               }
             },
-            onSuccess: (response: any) => {
-              if (onSuccess) {
-                  onSuccess(response.data);
-              }
+            onSuccess: () => {
+              // Handle success case if needed
               handleOpenChange(false);
             },
         });
@@ -385,8 +387,8 @@ export function MachineEditDialog({
       hostname: machine?.hostname || '',
       fingerprint: machine?.fingerprint || '',
       status: machine?.status || 'active',
-      client_id: machine?.client_id || '',
-      license_id: machine?.license_id || '',
+      client_id: machine?.client_id ? machine.client_id.toString() : '',
+      license_id: machine?.license_id ? machine.license_id.toString() : '',
   });
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -402,8 +404,8 @@ export function MachineEditDialog({
           setData('hostname', machine.hostname || '');
           setData('fingerprint', machine.fingerprint || '');
           setData('status', machine.status || 'active');
-          setData('client_id', machine.client_id || '');
-          setData('license_id', machine.license_id || '');
+          setData('client_id', machine.client_id ? machine.client_id.toString() : '');
+          setData('license_id', machine.license_id ? machine.license_id.toString() : '');
       }
   }, [machine]);
 
@@ -411,12 +413,6 @@ export function MachineEditDialog({
       e.preventDefault();
       patch(route('machines.update', machine?.id), {
           preserveScroll: true,
-          onSuccess: (response) => {
-              if (onSuccess) {
-                  onSuccess({ ...machine, ...data });
-              }
-              handleOpenChange(false);
-          },
           onError: (errors: any) => {
             if (errors.data) {
               if (onSuccess) {
@@ -424,6 +420,10 @@ export function MachineEditDialog({
               }
               handleOpenChange(false);
             }
+          },
+          onSuccess: () => {
+              // Handle success case if needed
+              handleOpenChange(false);
           }
       });
   };

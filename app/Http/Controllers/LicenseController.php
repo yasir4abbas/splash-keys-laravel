@@ -43,7 +43,7 @@ class LicenseController extends Controller
 
     public function list()
     {
-        $licenses = License::all();
+        $licenses = License::with('machines')->get();
         return response()->json($licenses);
     }
 
@@ -53,7 +53,7 @@ class LicenseController extends Controller
             'license_key' => 'required|string|unique:licenses,license_key',
             'license_type' => 'required|string|in:per-user,per-machine,concurrent-users',
             'max_count' => 'required|integer|min:1',
-            'expiration_date' => 'required|string',
+            'expiration_date' => 'nullable|string',
             'cost' => 'required|string',
             'status' => 'required|string|in:active,inactive',
             'package_id' => 'required|exists:packages,id',
@@ -71,7 +71,7 @@ class LicenseController extends Controller
             'license_key' => 'required|string|unique:licenses,license_key,' . $id,
             'license_type' => 'required|string|in:per-user,per-machine',
             'max_count' => 'required|integer|min:1',
-            'expiration_date' => 'required|string',
+            'expiration_date' => 'nullable|string',
             'cost' => 'required|string',
             'status' => 'required|string|in:active,inactive',
             'package_id' => 'required|exists:packages,id',
@@ -84,8 +84,11 @@ class LicenseController extends Controller
     public function destroy($id)
     {
         $license = License::find($id);
+        if (!$license) {
+            return back()->withErrors(['error' => 'License not found']);
+        }
         $license->delete();
-        return back()->withErrors(['data' => 'License deleted successfully']);
+        return redirect()->back();
     }
 
     public function getPackages()

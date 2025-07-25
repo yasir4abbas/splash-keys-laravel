@@ -50,9 +50,9 @@ class ClientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:clients,email',
-            'position' => 'required|string|max:255',
+            // 'position' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'access_level' => 'required|string|max:255',
+            // 'access_level' => 'required|string|max:255',
             'hostnames' => 'array',
             'hostnames.*' => 'string|max:255',
         ]);
@@ -105,7 +105,12 @@ class ClientController extends Controller
     public function destroy($id)
     {
         $client = Client::find($id);
+        $client->clientIPs()->delete();
+        $client->machines()->delete();
+        if (!$client) {
+            return back()->withErrors(['error' => 'Client not found']);
+        }
         $client->delete();
-        return back()->withErrors(['data' => 'Client deleted successfully']);
+        return redirect()->back();
     }
 }

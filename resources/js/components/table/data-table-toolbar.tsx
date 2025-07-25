@@ -20,7 +20,7 @@ export function DataTableToolbar<TData>({
   searchColumns,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
-  const searchCols = searchColumns && searchColumns.length ? searchColumns : ["name", "label", "country"]
+  const searchCols = searchColumns && searchColumns.length ? searchColumns : ["name", "client", "country"]
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">

@@ -98,7 +98,10 @@ class PackageController extends Controller
     public function destroy($id)
     {
         $package = Package::find($id);
+        if (!$package) {
+            return back()->withErrors(['error' => 'Package not found']);
+        }
         $package->delete();
-        return back()->withErrors(['data' => 'Package deleted successfully']);
+        return redirect()->back();
     }
 }

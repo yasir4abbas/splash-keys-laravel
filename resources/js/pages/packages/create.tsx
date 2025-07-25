@@ -137,7 +137,7 @@ export default function CreatePackage({ package: packageItem }: CreatePackagePag
 
                     <div className="max-w-2xl mx-auto">
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="border rounded-lg p-4">
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="package_name">
@@ -197,7 +197,7 @@ export default function CreatePackage({ package: packageItem }: CreatePackagePag
                                 </div>
                             </div>
 
-                            <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="border rounded-lg p-4">
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <h3 className="text-lg font-medium">Metadata</h3>

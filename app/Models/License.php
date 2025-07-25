@@ -25,7 +25,7 @@ class License extends Model
 
     protected $casts = [
         'status' => 'string',
-        'expiration_date' => 'date',
+        'expiration_date' => 'date:Y-m-d',
         'cost' => 'decimal:2',
         'max_count' => 'integer',
     ];

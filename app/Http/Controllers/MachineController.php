@@ -38,7 +38,7 @@ class MachineController extends Controller
             'license_id' => 'required|integer|exists:licenses,id',
         ]);
         $machine = Machine::create($request->all());
-        return back()->withErrors(['data' => json_encode($machine)]);
+        return back()->withErrors(['data' => json_encode($machine->load(['client', 'license']))]);
     }
 
     public function update(Request $request, $id)
@@ -51,14 +51,20 @@ class MachineController extends Controller
             'license_id' => 'required|integer|exists:licenses,id',
         ]);
         $machine = Machine::find($id);
+        if (!$machine) {
+            return back()->withErrors(['error' => 'Machine not found']);
+        }
         $machine->update($request->all());
-        return back()->withErrors(['data' => json_encode($machine)]);
+        return back()->withErrors(['data' => json_encode($machine->load(['client', 'license']))]);
     }
 
     public function destroy($id)
     {
         $machine = Machine::find($id);
+        if (!$machine) {
+            return back()->withErrors(['error' => 'Machine not found']);
+        }
         $machine->delete();
-        return back()->withErrors(['data' => 'Machine deleted successfully']);
+        return redirect()->back();
     }
 }

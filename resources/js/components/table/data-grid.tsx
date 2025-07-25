@@ -151,7 +151,7 @@ export function DataGrid<TData, TValue>({
                   <img 
                     src={flagSrc} 
                     alt="Flag" 
-                    className="w-5 h-4 object-cover rounded-sm border border-gray-200"
+                    className="w-5 h-4 object-cover rounded-sm border"
                     onError={(e) => {
                       // Hide flag if image fails to load
                       e.currentTarget.style.display = 'none'
