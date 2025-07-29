@@ -25,6 +25,11 @@ export const licenseSchema = z.object({
   package_id: z.number(),
   created_at: z.string(),
   updated_at: z.string(),
+  package: z.object({
+    id: z.number(),
+    package_name: z.string(),
+    version: z.string(),
+  }).optional(),
   machines: z.array(z.object({
     id: z.number(),
     machine_id: z.string(),
@@ -196,6 +201,31 @@ export const licenseColumns: ColumnDef<License>[] = [
           <Badge variant={status === 'active' ? 'default' : 'secondary'}>
             {status}
           </Badge>
+        </div>
+      )
+    },
+  },
+
+  {
+    accessorKey: "package",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Package" />
+    ),
+    meta: {
+      title: "Package",
+    },
+    cell: ({ row }) => {
+      const packageData = row.getValue("package") as any
+      return (
+        <div className="flex space-x-2">
+          {packageData ? (
+            <div className="flex flex-col">
+              <span className="font-medium">{packageData.package_name}</span>
+              <span className="text-sm text-gray-500">v{packageData.version}</span>
+            </div>
+          ) : (
+            <span className="text-gray-500 text-sm">No package</span>
+          )}
         </div>
       )
     },

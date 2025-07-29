@@ -32,7 +32,7 @@ interface CreateLicensePageProps {
 export default function CreateLicense({ license, packages }: CreateLicensePageProps) {
     const { auth } = usePage<SharedData>().props;
     const isEditing = !!license;
-    const [hasExpiration, setHasExpiration] = useState(true);
+    const [hasExpiration, setHasExpiration] = useState(false);
     
     const { data, setData, post, patch, processing, errors, reset } = useForm({
         license_key: '',
@@ -42,7 +42,7 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
         cost: '0',
         renewal_terms: '',
         status: 'active',
-        package_id: '',
+        package_id: packages.length > 0 ? packages[0].id.toString() : '',
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -77,8 +77,9 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
                 status: license.status || 'active',
                 package_id: license.package_id?.toString() || '',
             });
-            // Set expiration checkbox based on whether license has expiration date
             setHasExpiration(!!license.expiration_date);
+        } else {
+            generateKey();
         }
     }, [license]);
 
