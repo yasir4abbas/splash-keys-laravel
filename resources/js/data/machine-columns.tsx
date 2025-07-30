@@ -17,6 +17,9 @@ export const machineSchema = z.object({
   status: z.string(),
   client_id: z.number(),
   license_id: z.number(),
+  platform: z.string().nullable(),
+  os: z.string().nullable(),
+  cpu: z.string().nullable(),
   client: z.object({
     id: z.number(),
     name: z.string(),
@@ -75,6 +78,66 @@ export const createMachineColumns = (): ColumnDef<Machine>[] => [
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
             {hostname || "N/A"}
+          </span>
+        </div>
+      )
+    },
+  },
+
+  {
+    accessorKey: "os",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="OS" />
+    ),
+    meta: {
+      title: "OS",
+    },
+    cell: ({ row }) => {
+      const os = row.getValue("os") as string
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[200px] truncate font-medium">
+            {os || "N/A"}
+          </span>
+        </div>
+      )
+    },
+  },
+
+  {
+    accessorKey: "platform",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Platform" />
+    ),
+    meta: {
+      title: "Platform",
+    },
+    cell: ({ row }) => {
+      const platform = row.getValue("platform") as string
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[200px] truncate font-medium">
+            {platform || "N/A"}
+          </span>
+        </div>
+      )
+    },
+  },
+
+  {
+    accessorKey: "cpu",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="CPU Name" />
+    ),
+    meta: {
+      title: "CPU Name",
+    },
+    cell: ({ row }) => {
+      const cpu = row.getValue("cpu") as string
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[200px] truncate font-medium">
+            {cpu || "N/A"}
           </span>
         </div>
       )

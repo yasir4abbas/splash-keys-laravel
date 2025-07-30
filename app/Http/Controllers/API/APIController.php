@@ -22,6 +22,9 @@ class APIController extends Controller
                 'license_key' => 'required|string|exists:licenses,license_key',
                 'hostname' => 'required|string|max:255',
                 'fingerprint' => 'required|string|max:500',
+                'os' => 'nullable|string|max:255',
+                'platform' => 'nullable|string|max:255',
+                'cpu' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -78,7 +81,10 @@ class APIController extends Controller
                     'license_id' => $license->id,
                     'hostname' => $request->hostname,
                     'client_id' => $clientIP->client_id,
-                    'status' => 'active'
+                    'status' => 'active',
+                    'os' => $request->os,
+                    'platform' => $request->platform,
+                    'cpu' => $request->cpu,
                 ]);
                 
                 return response()->json([
@@ -107,7 +113,10 @@ class APIController extends Controller
                 'fingerprint' => $request->fingerprint,
                 'client_id' => $clientIP->client_id,
                 'license_id' => $license->id,
-                'status' => 'active'
+                'status' => 'active',
+                'os' => $request->os,
+                'platform' => $request->platform,
+                'cpu' => $request->cpu,
             ]);
 
             return response()->json([

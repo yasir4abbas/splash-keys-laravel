@@ -19,6 +19,9 @@ class Machine extends Model
         'status',
         'client_id',
         'license_id',
+        'platform',
+        'os',
+        'cpu',
     ];
 
     protected $casts = [
