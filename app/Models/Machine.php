@@ -22,6 +22,7 @@ class Machine extends Model
         'platform',
         'os',
         'cpu',
+        'ip',
     ];
 
     protected $casts = [

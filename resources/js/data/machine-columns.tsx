@@ -20,6 +20,7 @@ export const machineSchema = z.object({
   platform: z.string().nullable(),
   os: z.string().nullable(),
   cpu: z.string().nullable(),
+  ip: z.string().nullable(),
   client: z.object({
     id: z.number(),
     name: z.string(),
@@ -144,6 +145,25 @@ export const createMachineColumns = (): ColumnDef<Machine>[] => [
     },
   },
 
+  {
+    accessorKey: "ip",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="IP" />
+    ),
+    meta: {
+      title: "IP",
+    },
+    cell: ({ row }) => {
+      const ip = row.getValue("ip") as string
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[100px] truncate font-medium">
+            {ip || "N/A"}
+          </span>
+        </div>
+      )
+    },
+  },
   {
     accessorKey: "fingerprint",
     header: ({ column }) => (

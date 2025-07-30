@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class APIController extends Controller 
 {
@@ -25,6 +26,7 @@ class APIController extends Controller
                 'os' => 'nullable|string|max:255',
                 'platform' => 'nullable|string|max:255',
                 'cpu' => 'nullable|string|max:255',
+                'machine_ip' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -85,6 +87,7 @@ class APIController extends Controller
                     'os' => $request->os,
                     'platform' => $request->platform,
                     'cpu' => $request->cpu,
+                    'ip' => $request->machine_ip,
                 ]);
                 
                 return response()->json([
@@ -117,6 +120,7 @@ class APIController extends Controller
                 'os' => $request->os,
                 'platform' => $request->platform,
                 'cpu' => $request->cpu,
+                'ip' => $request->machine_ip,
             ]);
 
             return response()->json([
@@ -242,8 +246,8 @@ class APIController extends Controller
                     // 'cost' => $license->cost,
                     'renewal_terms' => $license->renewal_terms,
                     'package' => $license->package ? [
-                        'id' => $license->package->id,
-                        'name' => $license->package->name,
+                        'id' => $license->package->package_id,
+                        'name' => $license->package->package_name,
                         'description' => $license->package->description,
                         'meta' => $meta
                     ] : null
