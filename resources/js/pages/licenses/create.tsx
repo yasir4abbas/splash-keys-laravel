@@ -67,21 +67,23 @@ export default function CreateLicense({ license, packages }: CreateLicensePagePr
 
     useEffect(() => {
         if (license) {
+            const packageId = license.package_id?.toString() || '';
+            
             setData({
                 license_key: license.license_key || '',
-                license_type: license.license_type || 'per-user',
+                license_type: license.license_type || 'per-machine',
                 max_count: license.max_count || 1,
                 expiration_date: license.expiration_date || '',
                 cost: license.cost || '',
                 renewal_terms: license.renewal_terms || '',
                 status: license.status || 'active',
-                package_id: license.package_id?.toString() || '',
+                package_id: packageId,
             });
             setHasExpiration(!!license.expiration_date);
         } else {
             generateKey();
         }
-    }, [license]);
+    }, [license, packages]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

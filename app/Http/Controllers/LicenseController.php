@@ -25,8 +25,9 @@ class LicenseController extends Controller
 
     public function edit($id)
     {
-        $license = License::find($id);
+        $license = License::with('package')->find($id);
         $packages = Package::select('id', 'package_name', 'version')->get();
+        
         return Inertia::render('licenses/create', [
             'license' => $license,
             'packages' => $packages
@@ -76,8 +77,19 @@ class LicenseController extends Controller
             'status' => 'required|string|in:active,inactive',
             'package_id' => 'required|exists:packages,id',
         ]);
+        
         $license = License::find($id);
+        if (!$license) {
+            Log::error('License not found for update', ['id' => $id]);
+            return back()->withErrors(['error' => 'License not found']);
+        }
+        
+        if (!$request->has('renewal_terms')) {
+            $request->merge(['renewal_terms' => 'na']);
+        }
+        
         $license->update($request->all());
+        
         return back()->withErrors(['data' => json_encode($license)]);
     }
 

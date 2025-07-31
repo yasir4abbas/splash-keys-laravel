@@ -50,9 +50,7 @@ class ClientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:clients,email',
-            // 'position' => 'required|string|max:255',
             'start_date' => 'required|date',
-            // 'access_level' => 'required|string|max:255',
             'hostnames' => 'array',
             'hostnames.*' => 'string|max:255',
         ]);
@@ -78,14 +76,16 @@ class ClientController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:clients,email,' . $id,
-            'position' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'access_level' => 'required|string|max:255',
             'hostnames' => 'array',
             'hostnames.*' => 'string|max:255',
         ]);
         
         $client = Client::find($id);
+        if (!$client) {
+            return back()->withErrors(['error' => 'Client not found']);
+        }
+        
         $client->update($request->except('hostnames'));
         
         $client->clientIPs()->delete();

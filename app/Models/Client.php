@@ -13,9 +13,7 @@ class Client extends Model
     protected $fillable = [
         'name',
         'email',
-        'position',
         'start_date',
-        'access_level',
     ];
 
     protected $casts = [
