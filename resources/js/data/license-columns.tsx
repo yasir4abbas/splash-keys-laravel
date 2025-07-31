@@ -36,6 +36,11 @@ export const licenseSchema = z.object({
     hostname: z.string().nullable(),
     fingerprint: z.string().nullable(),
     status: z.string(),
+    client: z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string(),
+    }).nullable(),
   })).optional(),
 })
 

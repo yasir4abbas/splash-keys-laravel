@@ -19,28 +19,32 @@ export function DataTableToolbar<TData>({
   table,
   searchColumns,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0
-  const searchCols = searchColumns && searchColumns.length ? searchColumns : ["machine_id", "name", "email", "license_id", "package_name"]
+  const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter !== ""
+  
+  // Get all searchable columns (excluding action columns)
+  const getAllSearchableColumns = () => {
+    const allColumns = table.getAllColumns();
+    return allColumns.filter(column => 
+      column.id !== 'actions' && 
+      column.id !== 'select' && 
+      column.getCanFilter()
+    );
+  };
+
+  const searchableColumns = getAllSearchableColumns();
+  
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        {/* {table.getColumn("name") && ( */}
         <Input
-          placeholder="Search..."
-          value={table.getState().columnFilters.find(filter => 
-            searchCols.includes(filter.id)
-          )?.value as string ?? ""}
+          placeholder="Search all columns..."
+          value={table.getState().globalFilter ?? ""}
           onChange={(event) => {
             const value = event.target.value;
-            const columns = searchCols;
-            columns.forEach(columnId => {
-              const column = table.getAllColumns().find(col => col.id === columnId);
-              column?.setFilterValue(value);
-            });
+            table.setGlobalFilter(value);
           }}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {/* )} */}
         
         {/* {table.getColumn("status") && (
           <DataTableFacetedFilter
@@ -59,7 +63,10 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              table.resetColumnFilters();
+              table.setGlobalFilter("");
+            }}
             className="h-8 px-2 lg:px-3"
           >
             Reset

@@ -44,7 +44,7 @@ class LicenseController extends Controller
 
     public function list()
     {
-        $licenses = License::with(['machines', 'package'])->get();
+        $licenses = License::with(['machines.client', 'package'])->get();
         return response()->json($licenses);
     }
 

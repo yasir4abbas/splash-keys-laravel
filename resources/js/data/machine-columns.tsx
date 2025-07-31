@@ -68,17 +68,17 @@ export const createMachineColumns = (): ColumnDef<Machine>[] => [
   {
     accessorKey: "hostname",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Hostname" />
+      <DataTableColumnHeader column={column} title="Client Name" />
     ),
     meta: {
-      title: "Hostname",
+      title: "Client Name",
     },
     cell: ({ row }) => {
-      const hostname = row.getValue("hostname") as string
+      const machine = row.original
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {hostname || "N/A"}
+            {machine.client?.name || "N/A"}
           </span>
         </div>
       )
