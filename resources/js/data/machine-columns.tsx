@@ -86,7 +86,7 @@ export const createMachineColumns = (): ColumnDef<Machine>[] => [
   },
 
   {
-    accessorKey: "hostname",
+    accessorKey: "client",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Client Name" />
     ),
