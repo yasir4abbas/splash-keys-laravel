@@ -17,6 +17,25 @@ export const clientSchema = z.object({
   start_date: z.string(),
   access_level: z.string(),
   created_at: z.string(),
+  machines: z.array(z.object({
+    id: z.number(),
+    machine_id: z.string(),
+    hostname: z.string().nullable(),
+    status: z.string(),
+    platform: z.string().nullable(),
+    os: z.string().nullable(),
+    ip: z.string().nullable(),
+  })).optional(),
+  licenses: z.array(z.object({
+    id: z.number(),
+    license_id: z.string(),
+    license_key: z.string(),
+    license_type: z.string(),
+    expiration_date: z.string(),
+    cost: z.string(),
+    renewal_terms: z.string(),
+    status: z.string(),
+  })).optional(),
 })
 
 export type Client = z.infer<typeof clientSchema>
@@ -66,35 +85,72 @@ export const clientColumns: ColumnDef<Client>[] = [
   },
 
   {
-    accessorKey: "hostnames",
+    accessorKey: "machines",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Hostnames" />
+      <DataTableColumnHeader column={column} title="Machines" />
     ),
     meta: {
-      title: "Hostnames",
+      title: "Machines",
     },
     cell: ({ row }) => {
       const client = row.original as any;
-      const hostnames = client.hostnames || [];
+      const machines = client.machines || [];
       
-      if (hostnames.length === 0) {
+      if (machines.length === 0) {
         return (
           <div className="text-gray-400 text-sm">
-            No hostnames
+            No machines
           </div>
         )
       }
       
       return (
         <div className="flex flex-wrap gap-1">
-          {hostnames.slice(0, 3).map((hostname: string, index: number) => (
+          {machines.slice(0, 3).map((machine: any, index: number) => (
             <Badge key={index} variant="outline" className="text-xs">
-              {hostname}
+              {machine.hostname || machine.machine_id}
             </Badge>
           ))}
-          {hostnames.length > 3 && (
+          {machines.length > 3 && (
             <Badge variant="secondary" className="text-xs">
-              +{hostnames.length - 3} more
+              +{machines.length - 3} more
+            </Badge>
+          )}
+        </div>
+      )
+    },
+  },
+
+  {
+    accessorKey: "licenses",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Licenses" />
+    ),
+    meta: {
+      title: "Licenses",
+    },
+    cell: ({ row }) => {
+      const client = row.original as any;
+      const licenses = client.licenses || [];
+      
+      if (licenses.length === 0) {
+        return (
+          <div className="text-gray-400 text-sm">
+            No licenses
+          </div>
+        )
+      }
+      
+      return (
+        <div className="flex flex-wrap gap-1">
+          {licenses.slice(0, 3).map((license: any, index: number) => (
+            <Badge key={index} variant="outline" className="text-xs">
+              {license.license_key}
+            </Badge>
+          ))}
+          {licenses.length > 3 && (
+            <Badge variant="secondary" className="text-xs">
+              +{licenses.length - 3} more
             </Badge>
           )}
         </div>

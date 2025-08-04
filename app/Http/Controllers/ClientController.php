@@ -38,7 +38,7 @@ class ClientController extends Controller
 
     public function list()
     {
-        $clients = Client::with('clientIPs')->get();
+        $clients = Client::with(['clientIPs', 'machines', 'licenses'])->get();
         $clients->each(function ($client) {
             $client->hostnames = $client->clientIPs->pluck('hostname')->toArray();
         });

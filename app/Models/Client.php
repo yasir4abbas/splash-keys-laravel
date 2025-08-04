@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Client extends Model
 {
@@ -29,6 +30,11 @@ class Client extends Model
     public function clientIPs(): HasMany
     {
         return $this->hasMany(ClientIP::class);
+    }
+
+    public function licenses(): HasManyThrough
+    {
+        return $this->hasManyThrough(License::class, Machine::class, 'client_id', 'id', 'id', 'license_id');
     }
     
 } 
